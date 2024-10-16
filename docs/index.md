@@ -6,6 +6,7 @@
 ## 概述
 
 LibreChat 是一个开源的聊天应用程序，旨在提供用户友好的交流体验。它支持多种功能，包括实时消息传递、文件共享以及集成各种第三方服务。LibreChat 以隐私和安全为重点，确保用户的数据不被滥用或收集。
+更多信息，请查看官网GitHub：https://github.com/danny-avila/LibreChat
 
 ## 前提条件
 
