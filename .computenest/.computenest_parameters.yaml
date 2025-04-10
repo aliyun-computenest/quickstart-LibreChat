@@ -1,1 +1,17 @@
-{"ServicePort":"3080","SecurityPorts":["3080"],"RepoName":"linziqiaolzq/quickstart-LibreChat","Arch":"EcsSingle","DockerComposeEnvPath":".env","CommandTimeout":3600,"PostStartCommand":"# 在Docker Compose启动后执行此命令片段，命令中可以引用参数\necho \"after docker compose starts\"\n","ServiceType":"private","AllowedRegions":["cn-qingdao","cn-beijing","cn-zhangjiakou","cn-huhehaote","cn-wulanchabu","cn-hangzhou","cn-shanghai","cn-nanjing","cn-shenzhen","cn-heyuan","cn-guangzhou","cn-fuzhou","cn-wuhan-lr","cn-chengdu","cn-hongkong","ap-northeast-1","ap-northeast-2","ap-southeast-1","ap-southeast-2","ap-southeast-3","ap-southeast-6","ap-southeast-5","ap-southeast-7","us-east-1","us-west-1","eu-west-1","eu-central-1","me-east-1","me-central-1"],"ArtifactSourceType":"DockerCompose","PreStartCommand":"# 在Docker Compose启动前执行此命令片段，命令中可以引用参数\n\necho \"121.43.177.8 docker.io\" >>/etc/hosts\necho \"121.43.177.8 registry-1.docker.io\" >>/etc/hosts\necho \"121.43.177.8 auth.docker.io\" >>/etc/hosts\necho \"121.43.177.8 production.cloudflare.docker.com\" >>/etc/hosts\necho \"before docker compose starts\"\necho ${AdminPassword}\n# 使用sed命令将docker-compose.yaml中的password替换为${AdminPassword}\n# AdminPassword在用户实际部署时填写，/home/admin/application/docker-compose.yaml为固定路径，无需修改\nsed -i 's/password/\\${AdminPassword}/g' /home/admin/application/docker-compose.yaml\n","RegionId":"ap-southeast-1","CustomParameters":[{"NoEcho":true,"Type":"String","AssociationProperty":"ALIYUN::ECS::Instance::Password","Label":"管理员密码","Name":"AdminPassword"}],"DockerComposeYamlPath":"docker-compose.yml"}
+RuntimeType: Container
+ServiceType: private
+ArtifactSourceType: DockerCompose
+ServiceBuildRegion: ap-southeast-1
+RepoName: aliyun-computenest/quickstart-LibreChat
+DockerComposeEnvPath: .env
+RegionId: cn-hangzhou
+CustomParameters:
+- NoEcho: true
+  Type: String
+  AssociationProperty: ALIYUN::ECS::Instance::Password
+  Label: 管理员密码
+  Name: AdminPassword
+DockerComposeYamlPath: docker-compose.yml
+Owner: linziqiaolzq
+Branch: main
+Platform: github

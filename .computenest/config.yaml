@@ -1,54 +1,91 @@
 Service:
-  RegionId: ap-southeast-1
+  RegionId: cn-hangzhou
   DeployType: ros
+  OperationMetadata:
+    StatusOperationConfigs:
+      - TemplateName: ECS单机版
+        SupportOperations:
+          - Start
+          - Stop
+          - Restart
+    SupportBackup: true
+    ModifyParametersConfig:
+      - TemplateName: ECS单机版
+        Operation:
+          - Name: 变更ECS实例规格
+            Description: 变更ECS实例规格
+            Type: Custom
+            Parameters:
+              - EcsInstanceType
+          - Name: 变更ECS实例密码
+            Description: 变更ECS实例密码
+            Type: Custom
+            Parameters:
+              - InstancePassword
+    ParameterConfigs:
+      - TemplateName: 'ECS单机版'
+        Parameters:
+          AdminPassword:
+            Type: String
+            Default: ''
+            Description: 管理员密码
+        Metadata:
+           ParameterGroups:
+             - Parameters:
+                 - AdminPassword
+               DefaultEnvFilePath: ../.env
+               Formatter: env
+               Name: Default
   DeployMetadata:
     SupplierDeployMetadata:
-      FileArtifactRelation:
-        '{{ computenest::file::linziqiaolzq_quickstart-LibreChat-docker-compose }}':
-          ArtifactId: ${Artifact.Artifact_1.ArtifactId}
-          ArtifactVersion: ${Artifact.Artifact_1.ArtifactVersion}
+      SupplierTemplateConfigs:
+        - Name: ECS单机版
+          Url: 'ros_templates/template.yaml'
+          ArchitectureDiagramUrl: 'resources/architecture/architecture.jpg'
+          AllowedRegions:
+            - ap-southeast-1
+      ArtifactRelation:
+        ecs_image_quickstart-LibreChat:
+          ArtifactId: ${Artifact.EcsImage.ArtifactId}
+          ArtifactVersion: draft
     TemplateConfigs:
-      - Name: 单机版
+      - Name: ECS单机版
         Url: 'ros_templates/template.yaml'
+        ArchitectureDiagramUrl: 'resources/architecture/architecture.jpg'
         AllowedRegions:
-          - cn-qingdao
-          - cn-beijing
-          - cn-zhangjiakou
-          - cn-huhehaote
-          - cn-wulanchabu
-          - cn-hangzhou
-          - cn-shanghai
-          - cn-nanjing
-          - cn-shenzhen
-          - cn-heyuan
-          - cn-guangzhou
-          - cn-fuzhou
-          - cn-wuhan-lr
-          - cn-chengdu
-          - cn-hongkong
-          - ap-northeast-1
-          - ap-northeast-2
           - ap-southeast-1
-          - ap-southeast-2
-          - ap-southeast-3
-          - ap-southeast-6
-          - ap-southeast-5
-          - ap-southeast-7
-          - us-east-1
-          - us-west-1
-          - eu-west-1
-          - eu-central-1
-          - me-east-1
-          - me-central-1
   ServiceType: private
   ServiceInfo:
-    Locale: zh-CN
-    ShortDescription: docker compose deploy
-    Image: 'resources/icons/service_logo.png'
+    # 英文版可以再配置Locale为en-US的服务信息
+    - Locale: zh-CN
+      ShortDescription: demo
+      Image: 'resources/icons/service_logo.png'
 Artifact:
-  Artifact_1:
-    ArtifactType: File
-    ArtifactName: linziqiaolzq_quickstart-LibreChat-docker-compose
-    ArtifactProperty:
-      RegionId: cn-hangzhou
-      Url: 'resources/artifact_resources/docker_compose.tar'
+  EcsImage:
+    ArtifactType: EcsImage
+    ArtifactName: ecs_image_quickstart-LibreChat
+    Description: quickstart-LibreChat EcsImage
+    SupportRegionIds:
+        - ap-southeast-1
+    ArtifactBuildProperty:
+      CodeRepo:
+        Platform: github
+        Owner: linziqiaolzq
+        RepoName: aliyun-computenest/quickstart-LibreChat
+        Branch: main
+      RegionId: ap-southeast-1
+      CommandType: RunShellScript
+      CommandContent: |-
+        mkdir -p /root/application
+        if [ -e "/root/code/pgdata2" ]; then cp -r "/root/code/pgdata2" "/root/application/"; fi
+        if [ -e "/root/code/meili_data_v1.12" ]; then cp -r "/root/code/meili_data_v1.12" "/root/application/"; fi
+        if [ -e "/root/code/logs" ]; then cp -r "/root/code/logs" "/root/application/"; fi
+        if [ -e "/root/code/images" ]; then cp -r "/root/code/images" "/root/application/"; fi
+        if [ -e "/root/code/uploads" ]; then cp -r "/root/code/uploads" "/root/application/"; fi
+        if [ -e "/root/code/data-node" ]; then cp -r "/root/code/data-node" "/root/application/"; fi
+        if [ -e "/root/code/.env" ]; then cp -r "/root/code/.env" "/root/application/"; fi
+        if [ -e "/root/code/docker-compose.yml" ]; then cp -r "/root/code/docker-compose.yml" "/root/application/"; fi
+        cd /root/application
+        sed -i 's/pull_policy: always/pull_policy: if_not_present/g' docker-compose.yml
+        docker compose -f docker-compose.yml build 
+        docker compose -f docker-compose.yml pull 2>&1 | stdbuf -oL grep -viE 'Downloading|sha256|extracting|KiB|Downloaded' || true;
