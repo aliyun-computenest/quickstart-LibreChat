@@ -77,14 +77,14 @@ Artifact:
       CommandType: RunShellScript
       CommandContent: |-
         mkdir -p /root/application
-        if [ -e "/root/code/docker-compose.yml" ]; then cp -r "/root/code/docker-compose.yml" "/root/application/"; fi
-        if [ -e "/root/code/logs" ]; then cp -r "/root/code/logs" "/root/application/"; fi
-        if [ -e "/root/code/data-node" ]; then cp -r "/root/code/data-node" "/root/application/"; fi
         if [ -e "/root/code/uploads" ]; then cp -r "/root/code/uploads" "/root/application/"; fi
+        if [ -e "/root/code/logs" ]; then cp -r "/root/code/logs" "/root/application/"; fi
+        if [ -e "/root/code/.env" ]; then cp -r "/root/code/.env" "/root/application/"; fi
         if [ -e "/root/code/pgdata2" ]; then cp -r "/root/code/pgdata2" "/root/application/"; fi
         if [ -e "/root/code/meili_data_v1.12" ]; then cp -r "/root/code/meili_data_v1.12" "/root/application/"; fi
+        if [ -e "/root/code/docker-compose.yml" ]; then cp -r "/root/code/docker-compose.yml" "/root/application/"; fi
+        if [ -e "/root/code/data-node" ]; then cp -r "/root/code/data-node" "/root/application/"; fi
         if [ -e "/root/code/images" ]; then cp -r "/root/code/images" "/root/application/"; fi
-        if [ -e "/root/code/.env" ]; then cp -r "/root/code/.env" "/root/application/"; fi
         cd /root/application
         sed -i 's/pull_policy: always/pull_policy: if_not_present/g' docker-compose.yml
         docker compose -f docker-compose.yml build 
