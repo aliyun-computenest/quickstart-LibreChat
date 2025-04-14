@@ -86,6 +86,13 @@ sudo vim .env
 
 ### 三、如何添加第三方API模型
 
+注：本服务已默认添加通义千问模型，具体使用方法仅需输入APIKey即可调用：
+![img.png](17.png)
+在LibreChat软件中即可调用：
+![img.png](18.png)
+
+若还希望添加其他模型，本文档以如何添加通义千问为例展开说明：
+
 1. 进入ECS，方式参考问题一。
 2. 修改librechat.yaml文件：新增第三方模型，输入命令（librechat.yaml文件可参考[链接](https://www.librechat.ai/docs/configuration/librechat_yaml/example)）。
 ```json
