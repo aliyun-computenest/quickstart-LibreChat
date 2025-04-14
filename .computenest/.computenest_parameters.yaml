@@ -6,10 +6,11 @@ RepoName: aliyun-computenest/quickstart-LibreChat
 DockerComposeEnvPath: .env
 RegionId: cn-hangzhou
 CustomParameters:
-- NoEcho: true
+- NoEcho: false
   Type: String
-  AssociationProperty: ALIYUN::ECS::Instance::Password
-  Label: QWEN_API_KEY
+  AllowedPattern: ''
+  Label: 通义千问APIKey
+  ConstraintDescription: ''
   Name: QWEN_API_KEY
 DockerComposeYamlPath: docker-compose.yml
 Owner: linziqiaolzq
