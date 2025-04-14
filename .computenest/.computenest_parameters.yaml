@@ -9,8 +9,8 @@ CustomParameters:
 - NoEcho: true
   Type: String
   AssociationProperty: ALIYUN::ECS::Instance::Password
-  Label: 管理员密码
-  Name: AdminPassword
+  Label: QWEN_API_KEY
+  Name: QWEN_API_KEY
 DockerComposeYamlPath: docker-compose.yml
 Owner: linziqiaolzq
 Branch: main
