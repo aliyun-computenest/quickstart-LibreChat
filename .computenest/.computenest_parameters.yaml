@@ -9,7 +9,7 @@ CustomParameters:
 - NoEcho: false
   Type: String
   AllowedPattern: ''
-  Label: 通义千问API Key
+  Label: （选填）通义千问API Key
   ConstraintDescription: ''
   Name: QWEN_API_KEY
 DockerComposeYamlPath: docker-compose.yml
