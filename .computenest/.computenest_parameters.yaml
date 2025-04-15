@@ -1,18 +1,1 @@
-RuntimeType: Container
-ServiceType: private
-ArtifactSourceType: DockerCompose
-ServiceBuildRegion: ap-southeast-1
-RepoName: aliyun-computenest/quickstart-LibreChat
-DockerComposeEnvPath: .env
-RegionId: cn-hangzhou
-CustomParameters:
-- NoEcho: false
-  Type: String
-  AllowedPattern: ''
-  Label: 通义千问APIKey
-  ConstraintDescription: ''
-  Name: QWEN_API_KEY
-DockerComposeYamlPath: docker-compose.yml
-Owner: linziqiaolzq
-Branch: main
-Platform: github
+{"RepoName":"aliyun-computenest/quickstart-LibreChat","RegionId":"cn-hangzhou","Owner":"mengjunwei-mjw","Branch":"main","Platform":"github"}
