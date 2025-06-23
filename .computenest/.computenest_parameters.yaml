@@ -13,6 +13,6 @@ CustomParameters:
   ConstraintDescription: ''
   Name: QWEN_API_KEY
 DockerComposeYamlPath: docker-compose.yml
-Owner: linziqiaolzq
+Owner: workhardliuzheng
 Branch: main
 Platform: github

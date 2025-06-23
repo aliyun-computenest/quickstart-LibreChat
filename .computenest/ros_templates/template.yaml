@@ -1,4 +1,11 @@
 ROSTemplateFormatVersion: '2015-09-01'
+Locals:
+  CurTime:
+    Type: Eval
+    Value:
+      Fn::FormatTime:
+        - '%Y%m%d-%H%M%S'
+        - Asia/Shanghai
 Conditions:
   CreateVpcConditions:
     Fn::Equals:
@@ -267,6 +274,46 @@ Resources:
       InternetMaxBandwidthOut: 5
       IoOptimized: optimized
       MaxAmount: 1
+      DiskMappings:
+        - Category: cloud_essd
+          Size: 200
+      # 数据盘初始化和挂载
+      UserData: |
+        #cloud-config
+        bootcmd:
+          - |
+            #!/bin/bash
+            function init_and_mount_data_disk() {
+                disk_device="/dev/vdb"
+                parted_disk_device="/dev/vdb1"
+                mount_point="/data"
+                # 已初始化的磁盘，跳过初始化，直接挂载
+                if blkid -o value -s TYPE $disk_device &>/dev/null; then
+                  echo "Disk is already initialized."
+                else
+                  echo "Disk is not initialized, initializing..."
+                  cat >> /root/InitDataDisk.sh << "EOF"
+            #!/bin/bash
+            echo "p
+            n
+            p
+
+
+
+            w
+            " |  fdisk -u /dev/vdb
+            EOF
+                  /bin/bash /root/InitDataDisk.sh
+                  rm -f /root/InitDataDisk.sh
+                  mkfs -t ext4 $parted_disk_device
+                fi
+
+                cp /etc/fstab /etc/fstab.bak
+                mkdir $mount_point
+                echo `blkid $parted_disk_device | awk '{print $2}' | sed 's/\\\"//g'` $mount_point ext4 defaults 0 0 >> /etc/fstab
+                mount -a
+            }
+            init_and_mount_data_disk
   RunInstallCommand:
     Type: ALIYUN::ECS::RunCommand
     Properties:
@@ -280,9 +327,14 @@ Resources:
       CommandContent:
         Fn::Sub:
           - |
-            file_path="/etc/systemd/system/quickstart-LibreChat.service"
-            if [ ! -f "$file_path" ]; then
-            cat > $file_path <<EOF
+            # 创建开机自启动配置和状态检查脚本
+            function create_systemd_config() {
+                file_path="/etc/systemd/system/quickstart-LibreChat.service"
+                if [ -f "$file_path" ]; then
+                    echo "Systemd配置已存在: $file_path"
+                    return 1
+                fi
+                cat > $file_path <<EOF
             [Unit]
             Description=Docker Compose Application Service
             Requires=docker.service
@@ -300,8 +352,8 @@ Resources:
             WantedBy=multi-user.target
             EOF
 
-            # 创建状态检查脚本
-            cat > /usr/local/bin/check-container-status <<'EOF'
+                # 创建状态检查脚本
+                cat > /usr/local/bin/check-container-status <<'EOF'
             #!/bin/bash
             COMPOSE_FILE="docker-compose.yml"
             MAX_WAIT_TIME=3600
@@ -367,19 +419,42 @@ Resources:
             exit 1
             EOF
 
-            chmod +x /usr/local/bin/check-container-status
-            systemctl enable quickstart-LibreChat
-            
-            fi
-            cat > /root/application/.env << "EOF"
+                chmod +x /usr/local/bin/check-container-status
+                systemctl enable quickstart-LibreChat
+                
+            }
+
+            function create_custom_parameter_file() {
+                cat > /root/application/.env << "EOF"
             {{ serviceConfigParam }}
             EOF
 
-            systemctl is-active --quiet quickstart-LibreChat && systemctl stop quickstart-LibreChat
+                systemctl is-active --quiet quickstart-LibreChat && systemctl stop quickstart-LibreChat
+            }
+
+            function mount_data_disk_dir() {
+                # 先计算出docker-compose.yaml的父目录
+                docker_compose_parent_dir=$(dirname "/root/application/docker-compose.yml")
+                # 复制软件目录下目录和文件到数据盘挂载目录，加-n参数已存在则不进行复制
+                cp -rn $docker_compose_parent_dir/* /data
+                # sed替换挂载目录路径为数据盘目录
+                cp $docker_compose_parent_dir/docker-compose.yaml $docker_compose_parent_dir/docker-compose.yaml.bak
+                sed -i 's|\./|/data/|g' $docker_compose_parent_dir/docker-compose.yaml
+                chmod -R 777 /data
+            }
+
+            #用于版本升级
+            echo "当前时间：${CurTime}"
+            create_systemd_config
             systemctl daemon-reload
+            systemctl stop quickstart-LibreChat
+            create_custom_parameter_file
+            mount_data_disk_dir
             systemctl start quickstart-LibreChat
           - RegionId:
               Ref: ALIYUN::Region
+            CurTime:
+              Ref: CurTime
 Outputs: 
   api_address:
     Description:
