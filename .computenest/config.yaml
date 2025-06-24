@@ -33,7 +33,7 @@ Service:
         ParameterGroups:
         - Parameters:
           - QWEN_API_KEY
-          DefaultEnvFilePath: ../.env
+          DefaultEnvFilePath: .env
           Formatter: env
           Name: Default
   UpgradeMetadata:
