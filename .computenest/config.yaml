@@ -65,11 +65,14 @@ Service:
   ServiceInfo:
     # 英文版可以再配置Locale为en-US的服务信息
   - Locale: zh-CN
-    Name: aliyun-computenest/quickstart-LibreChat-p9yr
-    ShortDescription: Service description
+    Name: LibreChat社区版
+    ShortDescription: LibreChat 是一个开源的聊天应用程序，旨在提供用户友好的交流体验。它支持多种功能，包括实时消息传递、文件共享以及集成各种第三方服务。LibreChat 以隐私和安全为重点，确保用户的数据不被滥用或收集。
     Image: 
       https://service-info-public.oss-cn-hangzhou.aliyuncs.com/1853370294850618/service-image/bfd30cc4-e959-4093-b5cb-77a05058b911.png
-    Softwares: []
+    Softwares:
+      - Name: librechat
+        Version: 0.7.9
+        Locale: zh-CN
 Artifact:
   EcsImage:
     ArtifactType: EcsImage
